@@ -113,9 +113,13 @@ function refresh() {
         } else {
             arcChart.addData([100], "");
             l2arcChart.addData([100], "");
+            arcChart.datasets[0].bars[arcChart.datasets[0].bars.length - 1].fillColor = "rgba(220,220,220,0.5)";
+            arcChart.update();
+            l2arcChart.datasets[0].bars[l2arcChart.datasets[0].bars.length - 1].fillColor = "rgba(220,220,220,0.5)";
+            l2arcChart.update();
         }
         
-        if (arcChart.datasets[0].points.length > 60) {
+        if (arcChart.datasets[0].bars.length > 60) {
             arcChart.removeData();
             l2arcChart.removeData();
         }
@@ -124,9 +128,9 @@ function refresh() {
 
 $(document).ready(function () {
     ctx = document.getElementById("arcChart").getContext("2d");
-    arcChart = new Chart(ctx).Line(arcData, null);
+    arcChart = new Chart(ctx).Bar(arcData, null);
     l2ctx = document.getElementById("l2arcChart").getContext("2d");
-    l2arcChart = new Chart(l2ctx).Line(l2arcData, null);
+    l2arcChart = new Chart(l2ctx).Bar(l2arcData, null);
     console.log("Starting...");
     refresh();
 
