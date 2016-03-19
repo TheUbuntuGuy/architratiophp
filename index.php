@@ -1,7 +1,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>ZFS ARC Hit Ratio Monitor</title>
+        <title>ZFS ARC Hit Rate Monitor</title>
         <style type="text/css">
             h1, p {
                 font-family: 'Helvetica', 'Arial', sans-serif;
@@ -18,10 +18,12 @@
         </style>
     </head>
     <body>
-        <h1>ARC Hit Ratio</h1>
-        <canvas id="arcChart" width="1750" height="400"></canvas>
-        <h1>L2ARC Hit Ratio</h1>
-        <canvas id="l2arcChart" width="1750" height="400"></canvas>
+        <h1>ARC Hit Rate</h1>
+        <canvas id="arcChart" width="1750" height="250"></canvas>
+        <h1>L2ARC Hit Rate</h1>
+        <canvas id="l2arcChart" width="1750" height="250"></canvas>
+        <h1>IOPS</h1>
+        <canvas id="iopsChart" width="1750" height="250"></canvas>
         <div id="copyright">Copyright &copy; 2016 Mark Furneaux, Romaco Canada</div>
     </body>
     <script src="js/jquery-2.2.2.min.js"></script>

@@ -2,6 +2,8 @@ var arcChart;
 var ctx;
 var l2arcChart;
 var l2ctx;
+var iopsChart;
+var iopsctx;
 
 var hitrate;
 var l2hitrate;
@@ -57,8 +59,10 @@ Chart.defaults.global = {
     tooltipXOffset: 10,
     tooltipTemplate: "<%if (label){%><%=label%>: <%}%><%= value %>",
     multiTooltipTemplate: "<%= value %>",
-    onAnimationProgress: function(){},
-    onAnimationComplete: function(){}
+    onAnimationProgress: function () {
+    },
+    onAnimationComplete: function () {
+    }
 };
 
 var arcData = {
@@ -93,6 +97,21 @@ var l2arcData = {
     ]
 };
 
+var iopsData = {
+    labels: [],
+    datasets: [
+        {
+            label: "IOPS",
+            fillColor: "rgba(246,136,41,0.5)",
+            strokeColor: "rgba(220,220,220,1)",
+            pointColor: "rgba(220,220,220,1)",
+            pointStrokeColor: "#fff",
+            pointHighlightFill: "#fff",
+            pointHighlightStroke: "rgba(220,220,220,1)",
+            data: [0]
+        }
+    ]
+};
 
 function refresh() {
     $.getJSON("get_data.php", function (data) {
@@ -111,19 +130,39 @@ function refresh() {
             arcChart.addData([Math.round((hitrate / requests) * 100)], "");
             l2arcChart.addData([Math.round((l2hitrate / requests) * 100)], "");
         } else {
-            arcChart.addData([100], "");
-            l2arcChart.addData([100], "");
-            arcChart.datasets[0].bars[arcChart.datasets[0].bars.length - 1].fillColor = "rgba(220,220,220,0.5)";
+            arcChart.addData([0], "");
+            l2arcChart.addData([0], "");
+            //arcChart.datasets[0].bars[arcChart.datasets[0].bars.length - 1].fillColor = "rgba(220,220,220,0.5)";
             arcChart.update();
-            l2arcChart.datasets[0].bars[l2arcChart.datasets[0].bars.length - 1].fillColor = "rgba(220,220,220,0.5)";
+            //l2arcChart.datasets[0].bars[l2arcChart.datasets[0].bars.length - 1].fillColor = "rgba(220,220,220,0.5)";
             l2arcChart.update();
         }
-        
+        iopsChart.addData([Math.round(requests)], "");
+
         if (arcChart.datasets[0].bars.length > 60) {
             arcChart.removeData();
             l2arcChart.removeData();
+            iopsChart.removeData();
         }
     });
+}
+
+function prepareFirst() {
+    $.getJSON("get_data.php", function (data) {
+        hitrate = (data.hits - lasthits) / (refreshInterval / 1000);
+        l2hitrate = (data.l2hits - lastl2hits) / (refreshInterval / 1000);
+        missrate = (data.misses - lastmisses) / (refreshInterval / 1000);
+        l2missrate = (data.l2misses - lastl2misses) / (refreshInterval / 1000);
+
+        lasthits = data.hits;
+        lastmisses = data.misses;
+        lastl2hits = data.l2hits;
+        lastl2misses = data.l2misses;
+
+        requests = hitrate + missrate;
+    });
+
+    setInterval(refresh, refreshInterval);
 }
 
 $(document).ready(function () {
@@ -131,8 +170,9 @@ $(document).ready(function () {
     arcChart = new Chart(ctx).Bar(arcData, null);
     l2ctx = document.getElementById("l2arcChart").getContext("2d");
     l2arcChart = new Chart(l2ctx).Bar(l2arcData, null);
+    iopsctx = document.getElementById("iopsChart").getContext("2d");
+    iopsChart = new Chart(iopsctx).Bar(iopsData, {scaleOverride: false});
     console.log("Starting...");
-    refresh();
-
-    setInterval(refresh, refreshInterval);
+    
+    prepareFirst();
 });
